@@ -1,0 +1,11 @@
+<launch>
+    <rosparam file="$(find hikrobot_camera)/config/camera.yaml" command="load" />
+    <rosparam file="$(find hikrobot_camera)/config/calibration.yaml" command="load" />
+    <node pkg="hikrobot_camera" type="hikrobot_camera" name="hikrobot_camera" respawn="true" output="screen" />
+
+    <rosparam file="$(find yolov5_tensorrtx)/config/model.yaml" command="load" />
+    <node pkg="yolov5_tensorrtx" type="yolov5" name="yolov5_tensorrtx" respawn="true" output="screen" />
+    
+    <node pkg="time" type="main" name="time_sync" respawn="true" output="screen" />
+    <node pkg="projection" type="projection_v12" name="projection_v12" respawn="true" output="screen" />
+</launch>
