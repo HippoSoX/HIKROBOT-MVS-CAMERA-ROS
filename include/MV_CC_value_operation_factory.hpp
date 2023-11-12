@@ -82,11 +82,40 @@ namespace camera {
     // 0x01100012:BayerGB12
     // 0x010C002C:BayerGB12Packed
     enum PixelFormat {
-        BayerRG8 = 0,
+        Mono10 = 0,
+        Mono10Packed,
+        Mono12,
+        Mono12Packed,
+        Mono16,
+        RGB8Packed,
+        YUV422_8,
+        YUV422_8_UYVY,
+        BayerGR8,
+        BayerRG8,
+        BayerGB8 = 10,
+        BayerBG8,
+        BayerGB10,
+        BayerGB12,
+        BayerGB12Packed,
+        MAX_PIXELFORMAT
     };
 
     const std::vector<unsigned int> PIXEL_FORMATVECTOR = {
-        0x01080009
+        0x01100003,
+        0x010C0004,
+        0x01100005,
+        0x010C0006,
+        0x01100007,
+        0x02180014,
+        0x02100032,
+        0x0210001F,
+        0x01080008,
+        0x01080009,
+        0x0108000A,
+        0x0108000B,
+        0x0110000e,
+        0x01100012,
+        0x010C002C
     };
 
     class MVCCValue {
@@ -297,6 +326,9 @@ namespace camera {
             ~MVCCPixelFormat();
 
             int setValue(float value) {
+                if(value >= MAX_PIXELFORMAT) {
+                    return MV_E_GC_RANGE;
+                }
                 return MV_CC_SetPixelFormat(handle_, PIXEL_FORMATVECTOR.at(value));
             }
     };

@@ -19,7 +19,7 @@
 | height | 540 | 图像高度 |
 | Offset_x | 0 | X方向偏置 |
 | Offset_Y | 540 | Y方向偏置 |
-| PixelFormat | 0 | 像素格式,enum类型<br>允许的取值为: <br>0: 0x01080009 BayerRG8|
+| PixelFormat | 10 | 像素格式,enum类型<br>允许的取值为: <br>0: Mono10<br>1: Mono10Packed<br>2: Mono12<br>3: Mono12Packed<br>4: Mono16<br>5: RGB8Packed<br>6: YUV422_8<br>7: YUV422_8_UYVY<br>8: BayerGR8<br>9: BayerRG8<br>10: BayerGB8<br>11: BayerBG8<br>12: BayerGB10<br>13: BayerGB12<br>14: BayerGB12Packed<br>15: MAX_PIXELFORMAT|
 | FrameRateEnable | true | 使能帧率控制 |
 | FrameRate | 30 | 帧率 |
 | ExposureTime | 2000 | 曝光时间(us)<br>经过实测，白天在户外光照充足的情况下，2ms可清晰成像<br>晚上在车间2楼需要提高到5ms<br>推测阴天需在2～5ms之间调节 |

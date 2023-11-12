@@ -360,13 +360,12 @@ namespace camera {
         }
         else
         {
-            // if(calibrate_enable_) {
-            //     undistort(camera::frame, image);
-            // }
-            // else {
-            //     image = camera::frame;
-            // }
-            // frame_empty = 1;
+            if(calibrate_enable_) {
+                self.undistort(camera::frame, image);
+            }
+            else {
+                image = camera::frame;
+            }
             if(resize_enable_) {
                 image_resize(camera::frame, image);
             }
