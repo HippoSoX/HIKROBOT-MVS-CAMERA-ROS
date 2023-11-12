@@ -3,7 +3,7 @@ height: 540            #图像高度
 Offset_x: 0             #X方向偏置
 Offset_y: 540             #Y方向偏置
 
-PixelFormat: 0         #像素格式，0: BayerRB8
+PixelFormat: 10         #像素格式，10: BayerRB8
 
 FrameRateEnable: true   #使能 
 FrameRate: 30           #帧率
