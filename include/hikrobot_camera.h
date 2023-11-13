@@ -75,6 +75,7 @@ namespace camera
         int     brightness_;
         int     gain_auto_;
         bool    gamma_enable_;
+        int     gamma_selector_;
         float   gamma_;
         int     height_;
         int     width_;
