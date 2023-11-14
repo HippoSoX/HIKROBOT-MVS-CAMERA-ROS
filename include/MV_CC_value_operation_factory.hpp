@@ -226,6 +226,8 @@ namespace camera {
         HB_RGBA16_Packed,
         HB_BGRA16_Packed,
 
+        MAX_PIXELFORMAT,
+
         Undefined           = 0xFF
     };
 
