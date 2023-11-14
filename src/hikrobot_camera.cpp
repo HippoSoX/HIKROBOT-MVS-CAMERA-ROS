@@ -35,6 +35,7 @@ namespace camera {
         node.param("BalanceWhiteAuot", balance_white_auto_, 2);
         node.param("Brightness", brightness_, 100);
         node.param("GammaEnable", gamma_enable_, false);
+        node.param("GammaSelector", gamma_selector_, 1);
         node.param("Gamma", gamma_, (float)0.7);
         node.param("GainAuto", gain_auto_, 2);
         node.param("Offset_x", Offset_x_, 0);
@@ -77,6 +78,9 @@ namespace camera {
             distCoeffs_.at<double>(3,0) = p2;
             distCoeffs_.at<double>(4,0) = k3;
         }
+
+        uint32_t sdk_v = MV_CC_GetSDKVersion();
+        printf("SDK Version: v%d.%d.%d.%d\n", (sdk_v&0xFF000000)>>24, (sdk_v&0x00FF0000)>>16, (sdk_v&0x0000FF00)>>8, sdk_v&0x000000FF);
 
         //********** 枚举设备 ********************************/
         MV_CC_DEVICE_INFO_LIST stDeviceList;
@@ -130,47 +134,11 @@ namespace camera {
 
         //设置 yaml 文件里面的配置
         value_operator_ = new MVCCValueOperationFactory(&handle_);
-        this->set(CAP_PROP_FRAMERATE_ENABLE, frame_rate_enable_);
-        if (frame_rate_enable_)
-            this->set(CAP_PROP_FRAMERATE, frame_rate_);
-        this->set(CAP_PROP_HEIGHT, height_);
-        this->set(CAP_PROP_WIDTH, width_);
-        this->set(CAP_PROP_OFFSETX, Offset_x_);
-        this->set(CAP_PROP_OFFSETY, Offset_y_);
-        this->set(CAP_PROP_EXPOSURE_AUTO, exposure_auto_);
-        if(!exposure_auto_)
-            this->set(CAP_PROP_EXPOSURE_TIME, exposure_time_);
-        this->set(CAP_PROP_GAMMA_ENABLE, gamma_enable_);
-        if (gamma_enable_)
-            this->set(CAP_PROP_GAMMA, gamma_);
-        this->set(CAP_PROP_GAINAUTO, gain_auto_);
-        this->set(CAP_PROP_BALANCE_WHITE_AUTO, balance_white_auto_);
-        this->set(CAP_PROP_BRIGHTNESS, brightness_);
-        this->set(CAP_PROP_PIXEL_FORMAT, pixel_format_);
-        this->set(CAP_PROP_TRIGGER_MODE, trigger_mode_);
-        // this->set(CAP_PROP_TRIGGER_SOURCE, TriggerSource);
-        // this->set(CAP_PROP_LINE_SELECTOR, LineSelector);
+        this->reset();
+        if(MV_OK != nRet_) {
+            printf("set parameter error");
+        }
 
-        //********** frame **********/
-        // //白平衡 非自适应（给定参数0）
-        // nRet_ = MV_CC_SetEnumValue(handle_, "BalanceWhiteAuto", 0);
-        // //白平衡度
-        // int rgb[3] = {1742, 1024, 2371};
-        // for (int i = 0; i < 3; i++)
-        // {
-        //     //********** frame **********/
-
-        //     nRet = MV_CC_SetEnumValue(handle, "BalanceRatioSelector", i);
-        //     nRet = MV_CC_SetIntValue(handle, "BalanceRatio", rgb[i]);
-        // }
-        // if (MV_OK == nRet_)
-        // {
-        //     printf("set BalanceRatio OK! value=%f\n",0.0 );
-        // }
-        // else
-        // {
-        //     printf("Set BalanceRatio Failed! nRet = [%x]\n\n", nRet_);
-        // }
         //软件触发
         // ********** frame **********/
         // nRet_ = MV_CC_SetEnumValue(handle_, "TriggerMode", 0);
@@ -181,33 +149,6 @@ namespace camera {
         // else
         // {
         //     printf("MV_CC_SetTriggerMode fail! nRet [%x]\n", nRet_);
-        // }
-
-        //********** 图像格式 **********/
-        // 0x01100003:Mono10
-        // 0x010C0004:Mono10Packed
-        // 0x01100005:Mono12
-        // 0x010C0006:Mono12Packed
-        // 0x01100007:Mono16
-        // 0x02180014:RGB8Packed
-        // 0x02100032:YUV422_8
-        // 0x0210001F:YUV422_8_UYVY
-        // 0x01080008:BayerGR8
-        // 0x01080009:BayerRG8
-        // 0x0108000A:BayerGB8
-        // 0x0108000B:BayerBG8
-        // 0x0110000e:BayerGB10
-        // 0x01100012:BayerGB12
-        // 0x010C002C:BayerGB12Packed
-        // nRet_ = MV_CC_SetEnumValue(handle_, "PixelFormat", 0x01080009); // 目前 BayerRG8
-
-        // if (MV_OK == nRet_)
-        // {
-        //     printf("set PixelFormat OK ! value = RGB\n");
-        // }
-        // else
-        // {
-        //     printf("MV_CC_SetPixelFormat fail! nRet [%x]\n", nRet_);
         // }
         MVCC_ENUMVALUE t = {0};
         //********** frame **********/
@@ -304,26 +245,31 @@ namespace camera {
 
     bool Camera::reset()
     {
-        nRet_ = this->set(CAP_PROP_FRAMERATE_ENABLE, frame_rate_enable_);
-        nRet_ = this->set(CAP_PROP_FRAMERATE, frame_rate_) || nRet_;
-        // nRet_ = this->set(CAP_PROP_BURSTFRAMECOUNT, BurstFrameCount) || nRet;
-        nRet_ = this->set(CAP_PROP_HEIGHT, height_) || nRet_;
-        nRet_ = this->set(CAP_PROP_WIDTH, width_) || nRet_;
-        nRet_ = this->set(CAP_PROP_OFFSETX, Offset_x_) || nRet_;
-        nRet_ = this->set(CAP_PROP_OFFSETY, Offset_y_) || nRet_;
-        nRet_ = this->set(CAP_PROP_EXPOSURE_TIME, exposure_time_) || nRet_;
-        nRet_ = this->set(CAP_PROP_EXPOSURE_AUTO, exposure_auto_) || nRet_;
-        nRet_ = this->set(CAP_PROP_AUTO_EXPOSURE_TIME_LOWER_LIMIT, auto_exposure_time_lower_limit_) || nRet_;
-        nRet_ = this->set(CAP_PROP_AUTO_EXPOSURE_TIME_UPPER_LIMIT, auto_exposure_time_upper_limit_) || nRet_;
-        nRet_ = this->set(CAP_PROP_BALANCE_WHITE_AUTO, balance_white_auto_) || nRet_;
-        nRet_ = this->set(CAP_PROP_BRIGHTNESS, brightness_) || nRet_;
-        nRet_ = this->set(CAP_PROP_GAMMA_ENABLE, gamma_enable_) || nRet_;
-        nRet_ = this->set(CAP_PROP_GAMMA, gamma_) || nRet_;
-        nRet_ = this->set(CAP_PROP_GAINAUTO, gain_auto_) || nRet_;
-        nRet_ = this->set(CAP_PROP_PIXEL_FORMAT, pixel_format_) || nRet_;
-        nRet_ = this->set(CAP_PROP_TRIGGER_MODE, trigger_mode_) || nRet_;
-        // nRet_ = this->set(CAP_PROP_TRIGGER_SOURCE, TriggerSource_) || nRet_;
-        // nRet_ = this->set(CAP_PROP_LINE_SELECTOR, LineSelector_) || nRet_;
+        nRet_ = this->set(CAP_PROP_FRAMERATE_ENABLE, frame_rate_enable_)                                || nRet_;
+        if(frame_rate_enable_)
+            nRet_ = this->set(CAP_PROP_FRAMERATE, frame_rate_)                                          || nRet_;
+        nRet_ = this->set(CAP_PROP_HEIGHT, height_)                                                     || nRet_;
+        nRet_ = this->set(CAP_PROP_WIDTH, width_)                                                       || nRet_;
+        nRet_ = this->set(CAP_PROP_OFFSETX, Offset_x_)                                                  || nRet_;
+        nRet_ = this->set(CAP_PROP_OFFSETY, Offset_y_)                                                  || nRet_;
+        nRet_ = this->set(CAP_PROP_EXPOSURE_AUTO, exposure_auto_)                                       || nRet_;
+        if(!exposure_auto_)
+            nRet_ = this->set(CAP_PROP_EXPOSURE_TIME, exposure_time_)                                   || nRet_;
+        else {
+            nRet_ = this->set(CAP_PROP_AUTO_EXPOSURE_TIME_LOWER_LIMIT, auto_exposure_time_lower_limit_) || nRet_;
+            nRet_ = this->set(CAP_PROP_AUTO_EXPOSURE_TIME_UPPER_LIMIT, auto_exposure_time_upper_limit_) || nRet_;
+        }
+        nRet_ = this->set(CAP_PROP_BALANCE_WHITE_AUTO, balance_white_auto_)                             || nRet_;
+        nRet_ = this->set(CAP_PROP_BRIGHTNESS, brightness_)                                             || nRet_;
+        nRet_ = this->set(CAP_PROP_GAMMA_ENABLE, gamma_enable_)                                         || nRet_;
+        if(gamma_enable_) {
+            nRet_ = this->set(CAP_PROP_GAMMA_SELECTOR, gamma_selector_)                                 || nRet_;
+            if(gamma_selector_ == 1)
+                nRet_ = this->set(CAP_PROP_GAMMA, gamma_)                                               || nRet_;
+        }
+        nRet_ = this->set(CAP_PROP_GAINAUTO, gain_auto_)                                                || nRet_;
+        nRet_ = this->set(CAP_PROP_PIXEL_FORMAT, pixel_format_)                                         || nRet_;
+        nRet_ = this->set(CAP_PROP_TRIGGER_MODE, trigger_mode_)                                         || nRet_;
         return nRet_;
     }
 
@@ -361,7 +307,7 @@ namespace camera {
         else
         {
             if(calibrate_enable_) {
-                self.undistort(camera::frame, image);
+                this->undistort(camera::frame, image);
             }
             else {
                 image = camera::frame;
