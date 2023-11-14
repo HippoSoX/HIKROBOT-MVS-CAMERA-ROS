@@ -53,6 +53,7 @@ namespace camera {
         "Brightness",
         "Gain Auto",
         "Gamma Enable",
+        "Gamma Selector",
         "Gamma",
         "Height",
         "Width",
